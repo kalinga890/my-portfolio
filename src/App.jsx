@@ -1,5 +1,23 @@
 import { useState, useEffect, useRef } from "react";
 
+function useIsMobile() {
+  const [mobile, setMobile] = useState(window.innerWidth <= 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setMobile(window.innerWidth <= 768);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  return mobile;
+}
+
 /* ═══════════════════════════════════════════════════════════
    YOUR DATA — update links as needed
 ═══════════════════════════════════════════════════════════ */
@@ -204,6 +222,9 @@ function ThreeCanvas() {
 ═══════════════════════════════════════════════════════════ */
 const NAVS = ["About", "Skills", "Projects", "Experience", "Achievements", "Contact"];
 function Nav() {
+    const mobile = useIsMobile();
+    const [menuOpen, setMenuOpen] = useState(false);
+
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => { const fn = () => setScrolled(window.scrollY > 50); window.addEventListener("scroll", fn); return () => window.removeEventListener("scroll", fn); }, []);
   const go = (id) => document.getElementById(id.toLowerCase())?.scrollIntoView({ behavior: "smooth" });
@@ -213,7 +234,27 @@ function Nav() {
         style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: 22, fontWeight: 900, color: "#00D4FF", background: "none", border: "none", cursor: "pointer", letterSpacing: "-1px" }}>
         KA<span style={{ color: "#fff" }}>.</span>
       </button>
-      <div style={{ display: "flex", gap: 28, alignItems: "center" }}>
+      {mobile && (
+    <button
+      onClick={() => setMenuOpen(!menuOpen)}
+      style={{
+        background: "none",
+        border: "none",
+        color: "#00D4FF",
+        fontSize: "24px",
+        cursor: "pointer"
+      }}
+    >
+      ☰
+    </button>
+  )}
+      <div
+  style={{
+    display: mobile ? "none" : "flex",
+    gap: 28,
+    alignItems: "center",
+  }}
+>
         {NAVS.map(n => (
           <button key={n} onClick={() => go(n)}
             style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(148,163,184,0.8)", fontSize: 13, letterSpacing: "0.03em", transition: "color 0.2s" }}
@@ -230,6 +271,7 @@ function Nav() {
         </a>
       </div>
     </nav>
+    
   );
 }
 
@@ -250,18 +292,23 @@ function ScrollBar() {
    HERO
 ═══════════════════════════════════════════════════════════ */
 function Hero({ threeReady }) {
+  const mobile = useIsMobile();
   const typed = useTypewriter(ME.roles);
   return (
     <section style={{ position: "relative", minHeight: "100vh", display: "flex", alignItems: "center", overflow: "hidden" }}>
       {threeReady && <ThreeCanvas />}
       <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at center,rgba(5,8,20,0.35) 0%,rgba(5,8,20,0.72) 100%)", zIndex: 1 }} />
-      <div style={{ position: "relative", zIndex: 2, maxWidth: 960, margin: "0 auto", padding: "0 32px 32px", paddingTop: 110 }}>
+      <div style={{ position: "relative", zIndex: 2, maxWidth: 960, margin: "0 auto", padding: mobile
+  ? "90px 20px 40px"
+  : "0 32px 32px", paddingTop: 110 }}>
         <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 16px", borderRadius: 99, border: "1px solid rgba(0,212,255,0.3)", background: "rgba(0,212,255,0.05)", marginBottom: 26 }}>
           <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#10B981", display: "inline-block", animation: "pulse 2s infinite" }} />
           <span style={{ color: "#00D4FF", fontSize: 13, fontWeight: 600, letterSpacing: "0.04em" }}>Open to opportunities · Bengaluru & Remote</span>
         </div>
 
-        <h1 style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: "clamp(46px,7vw,86px)", fontWeight: 900, color: "#E8F4FD", lineHeight: 1.0, margin: "0 0 16px", letterSpacing: "-2px" }}>
+        <h1 style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: mobile
+  ? "clamp(36px,9vw,52px)"
+  : "clamp(46px,7vw,86px)", fontWeight: 900, color: "#E8F4FD", lineHeight: 1.0, margin: "0 0 16px", letterSpacing: "-2px" }}>
           {ME.name}
         </h1>
 
@@ -303,14 +350,22 @@ function Hero({ threeReady }) {
    ABOUT
 ═══════════════════════════════════════════════════════════ */
 function About() {
+  const mobile = useIsMobile();
   const [ref, vis] = useInView();
   return (
-    <section id="about" style={{ padding: "120px 32px" }}>
+    <section
+  id="about"
+  style={{
+    padding: mobile ? "80px 20px" : "120px 32px",
+  }}
+>
       <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-        <div ref={ref} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 60, alignItems: "center", opacity: vis ? 1 : 0, transition: "opacity 0.8s, transform 0.8s", transform: vis ? "none" : "translateY(36px)" }}>
+        <div ref={ref} style={{ display: "grid",
+gridTemplateColumns: mobile ? "1fr" : "1fr 1fr",
+gap: mobile ? 30 : 60, alignItems: "center", opacity: vis ? 1 : 0, transition: "opacity 0.8s, transform 0.8s", transform: vis ? "none" : "translateY(36px)" }}>
           <div>
             <p style={{ color: "#00D4FF", fontSize: 11, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 12 }}>Who I Am</p>
-            <h2 style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: 40, fontWeight: 900, color: "#E8F4FD", lineHeight: 1.1, marginBottom: 18 }}>
+            <h2 style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: mobile ? 30 : 40, fontWeight: 900, color: "#E8F4FD", lineHeight: 1.1, marginBottom: 18 }}>
               Fresher with<br /><span style={{ color: "#00D4FF" }}>real-world</span> experience.
             </h2>
             <p style={{ color: "rgba(148,163,184,0.82)", lineHeight: 1.82, fontSize: 15.5, marginBottom: 26 }}>{ME.about}</p>
